@@ -1,0 +1,1 @@
+if(typeof AWPageMounts=='undefined'){AWPageMounts={}};AWPageMounts['nav']={"name":"$navigation.md","path":"$navigation.md","content":"\n#### [首页](?file=home-首页)\n\n##### MySQL\n\n##### Linux\n\n##### Prometheus\n\n##### Kubernetes\n\n##### 故障汇总\n","timestamp":1606209331193}
