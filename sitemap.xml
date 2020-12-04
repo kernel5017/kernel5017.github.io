@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://www.for-dba.com/prometheus/index.html</loc>
+    <loc>https://www.for-dba.com/golang/index.html</loc>
     
     <lastmod>2020-12-04</lastmod>
     
@@ -16,14 +16,14 @@
   </url>
   
   <url>
-    <loc>https://www.for-dba.com/golang/index.html</loc>
+    <loc>https://www.for-dba.com/ceph/index.html</loc>
     
     <lastmod>2020-12-04</lastmod>
     
   </url>
   
   <url>
-    <loc>https://www.for-dba.com/ceph/index.html</loc>
+    <loc>https://www.for-dba.com/prometheus/index.html</loc>
     
     <lastmod>2020-12-04</lastmod>
     
