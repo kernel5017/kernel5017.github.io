@@ -4,19 +4,33 @@
   <url>
     <loc>https://www.for-dba.com/prometheus/index.html</loc>
     
-    <lastmod>2020-12-03</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://www.for-dba.com/prometheus-relabels2.html</loc>
-    
-    <lastmod>2020-12-03</lastmod>
+    <lastmod>2020-12-04</lastmod>
     
   </url>
   
   <url>
     <loc>https://www.for-dba.com/kubernetes/index.html</loc>
+    
+    <lastmod>2020-12-04</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.for-dba.com/golang/index.html</loc>
+    
+    <lastmod>2020-12-04</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.for-dba.com/ceph/index.html</loc>
+    
+    <lastmod>2020-12-04</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.for-dba.com/prometheus-relabels2.html</loc>
     
     <lastmod>2020-12-03</lastmod>
     
@@ -31,13 +45,6 @@
   
   <url>
     <loc>https://www.for-dba.com/prometheus-relabels.html</loc>
-    
-    <lastmod>2020-12-03</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://www.for-dba.com/ceph/index.html</loc>
     
     <lastmod>2020-12-03</lastmod>
     
@@ -75,13 +82,6 @@
     <loc>https://www.for-dba.com/shell/index.html</loc>
     
     <lastmod>2020-11-30</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://www.for-dba.com/golang/index.html</loc>
-    
-    <lastmod>2020-11-27</lastmod>
     
   </url>
   
@@ -130,7 +130,7 @@
 
   <url>
     <loc>https://www.for-dba.com/</loc>
-    <lastmod>2020-12-03</lastmod>
+    <lastmod>2020-12-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -138,35 +138,35 @@
   
   <url>
     <loc>https://www.for-dba.com/tags/etcd/</loc>
-    <lastmod>2020-12-03</lastmod>
+    <lastmod>2020-12-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.for-dba.com/tags/metrics/</loc>
-    <lastmod>2020-12-03</lastmod>
+    <lastmod>2020-12-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.for-dba.com/tags/etcd%E4%BC%98%E5%8C%96/</loc>
-    <lastmod>2020-12-03</lastmod>
+    <lastmod>2020-12-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.for-dba.com/tags/prometheus-labels/</loc>
-    <lastmod>2020-12-03</lastmod>
+    <lastmod>2020-12-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.for-dba.com/tags/relabel/</loc>
-    <lastmod>2020-12-03</lastmod>
+    <lastmod>2020-12-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -175,28 +175,28 @@
   
   <url>
     <loc>https://www.for-dba.com/categories/ceph/</loc>
-    <lastmod>2020-12-03</lastmod>
+    <lastmod>2020-12-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.for-dba.com/categories/etcd/</loc>
-    <lastmod>2020-12-03</lastmod>
+    <lastmod>2020-12-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.for-dba.com/categories/golang/</loc>
-    <lastmod>2020-12-03</lastmod>
+    <lastmod>2020-12-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.for-dba.com/categories/prometheus/</loc>
-    <lastmod>2020-12-03</lastmod>
+    <lastmod>2020-12-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
