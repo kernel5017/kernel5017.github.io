@@ -2,6 +2,20 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://www.for-dba.com/kubernetes/index.html</loc>
+    
+    <lastmod>2020-12-11</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.for-dba.com/linux/index.html</loc>
+    
+    <lastmod>2020-12-10</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://www.for-dba.com/prometheus-relabels2.html</loc>
     
     <lastmod>2020-12-10</lastmod>
@@ -79,23 +93,9 @@
   </url>
   
   <url>
-    <loc>https://www.for-dba.com/linux/index.html</loc>
-    
-    <lastmod>2020-12-09</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://www.for-dba.com/prometheus/index.html</loc>
     
     <lastmod>2020-12-09</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://www.for-dba.com/kubernetes/index.html</loc>
-    
-    <lastmod>2020-12-04</lastmod>
     
   </url>
   
@@ -172,7 +172,7 @@
 
   <url>
     <loc>https://www.for-dba.com/</loc>
-    <lastmod>2020-12-10</lastmod>
+    <lastmod>2020-12-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -180,70 +180,70 @@
   
   <url>
     <loc>https://www.for-dba.com/tags/etcd/</loc>
-    <lastmod>2020-12-10</lastmod>
+    <lastmod>2020-12-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.for-dba.com/tags/metrics/</loc>
-    <lastmod>2020-12-10</lastmod>
+    <lastmod>2020-12-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.for-dba.com/tags/etcd%E4%BC%98%E5%8C%96/</loc>
-    <lastmod>2020-12-10</lastmod>
+    <lastmod>2020-12-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.for-dba.com/tags/prometheus-labels/</loc>
-    <lastmod>2020-12-10</lastmod>
+    <lastmod>2020-12-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.for-dba.com/tags/relabel/</loc>
-    <lastmod>2020-12-10</lastmod>
+    <lastmod>2020-12-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.for-dba.com/tags/linux-tool/</loc>
-    <lastmod>2020-12-10</lastmod>
+    <lastmod>2020-12-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.for-dba.com/tags/mds/</loc>
-    <lastmod>2020-12-10</lastmod>
+    <lastmod>2020-12-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.for-dba.com/tags/sysbench/</loc>
-    <lastmod>2020-12-10</lastmod>
+    <lastmod>2020-12-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.for-dba.com/tags/node-exporter/</loc>
-    <lastmod>2020-12-10</lastmod>
+    <lastmod>2020-12-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.for-dba.com/tags/tool/</loc>
-    <lastmod>2020-12-10</lastmod>
+    <lastmod>2020-12-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -252,35 +252,35 @@
   
   <url>
     <loc>https://www.for-dba.com/categories/ceph/</loc>
-    <lastmod>2020-12-10</lastmod>
+    <lastmod>2020-12-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.for-dba.com/categories/etcd/</loc>
-    <lastmod>2020-12-10</lastmod>
+    <lastmod>2020-12-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.for-dba.com/categories/golang/</loc>
-    <lastmod>2020-12-10</lastmod>
+    <lastmod>2020-12-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.for-dba.com/categories/prometheus/</loc>
-    <lastmod>2020-12-10</lastmod>
+    <lastmod>2020-12-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://www.for-dba.com/categories/linux/</loc>
-    <lastmod>2020-12-10</lastmod>
+    <lastmod>2020-12-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>

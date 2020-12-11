@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://www.for-dba.com/kubernetes/index.html</loc>
+    <lastmod>2020-12-11</lastmod>
+  </url>
+  <url>
     <loc>https://www.for-dba.com/prometheus-relabels2.html</loc>
     <lastmod>2020-12-10</lastmod>
   </url>
@@ -43,10 +47,6 @@
   <url>
     <loc>https://www.for-dba.com/centos7%E5%AE%89%E8%A3%85ceph%E9%9B%86%E7%BE%A4.html</loc>
     <lastmod>2020-12-10</lastmod>
-  </url>
-  <url>
-    <loc>https://www.for-dba.com/kubernetes/index.html</loc>
-    <lastmod>2020-12-04</lastmod>
   </url>
   <url>
     <loc>https://www.for-dba.com/ceph%E6%95%85%E9%9A%9C%E6%B1%87%E6%80%BB.html</loc>
