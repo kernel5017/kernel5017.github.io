@@ -2,6 +2,76 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://www.for-dba.com/prometheus-relabels2.html</loc>
+    
+    <lastmod>2020-12-11</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.for-dba.com/prometheus-relabels.html</loc>
+    
+    <lastmod>2020-12-11</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.for-dba.com/prometheus-nodeexporter-problem-diskfound.html</loc>
+    
+    <lastmod>2020-12-11</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.for-dba.com/linux-tool-sysbench.html</loc>
+    
+    <lastmod>2020-12-11</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.for-dba.com/linux-tool-stress.html</loc>
+    
+    <lastmod>2020-12-11</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.for-dba.com/linux-tool-iperf3.html</loc>
+    
+    <lastmod>2020-12-11</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.for-dba.com/kubernetes-make-nginx.html</loc>
+    
+    <lastmod>2020-12-11</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.for-dba.com/ceph-mds.html</loc>
+    
+    <lastmod>2020-12-11</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.for-dba.com/ceph-mds-deploy.html</loc>
+    
+    <lastmod>2020-12-11</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.for-dba.com/ceph-k8s%E4%BD%BF%E7%94%A8ceph%E5%AD%98%E5%82%A8.html</loc>
+    
+    <lastmod>2020-12-11</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://www.for-dba.com/mysql/index.html</loc>
     
     <lastmod>2020-12-11</lastmod>
@@ -17,76 +87,6 @@
   
   <url>
     <loc>https://www.for-dba.com/linux/index.html</loc>
-    
-    <lastmod>2020-12-10</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://www.for-dba.com/prometheus-relabels2.html</loc>
-    
-    <lastmod>2020-12-10</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://www.for-dba.com/prometheus-relabels.html</loc>
-    
-    <lastmod>2020-12-10</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://www.for-dba.com/prometheus-nodeexporter-problem-diskfound.html</loc>
-    
-    <lastmod>2020-12-10</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://www.for-dba.com/linux-tool-sysbench.html</loc>
-    
-    <lastmod>2020-12-10</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://www.for-dba.com/linux-tool-stress.html</loc>
-    
-    <lastmod>2020-12-10</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://www.for-dba.com/linux-tool-iperf3.html</loc>
-    
-    <lastmod>2020-12-10</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://www.for-dba.com/kubernetes-make-nginx.html</loc>
-    
-    <lastmod>2020-12-10</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://www.for-dba.com/ceph-mds.html</loc>
-    
-    <lastmod>2020-12-10</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://www.for-dba.com/ceph-mds-deploy.html</loc>
-    
-    <lastmod>2020-12-10</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://www.for-dba.com/ceph-k8s%E4%BD%BF%E7%94%A8ceph%E5%AD%98%E5%82%A8.html</loc>
     
     <lastmod>2020-12-10</lastmod>
     
