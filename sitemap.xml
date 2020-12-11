@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://www.for-dba.com/mysql/index.html</loc>
+    
+    <lastmod>2020-12-11</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://www.for-dba.com/kubernetes/index.html</loc>
     
     <lastmod>2020-12-11</lastmod>
@@ -124,13 +131,6 @@
     <loc>https://www.for-dba.com/shell/index.html</loc>
     
     <lastmod>2020-11-30</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://www.for-dba.com/mysql/index.html</loc>
-    
-    <lastmod>2020-11-27</lastmod>
     
   </url>
   
