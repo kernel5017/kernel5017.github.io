@@ -23,6 +23,13 @@
   </url>
   
   <url>
+    <loc>https://www.for-dba.com/prometheus-exporter-ceph.html</loc>
+    
+    <lastmod>2020-12-11</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://www.for-dba.com/linux-tool-sysbench.html</loc>
     
     <lastmod>2020-12-11</lastmod>
@@ -44,7 +51,42 @@
   </url>
   
   <url>
+    <loc>https://www.for-dba.com/kubernetes-resource-limit.html</loc>
+    
+    <lastmod>2020-12-11</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://www.for-dba.com/kubernetes-make-nginx.html</loc>
+    
+    <lastmod>2020-12-11</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.for-dba.com/etcd-%E4%BC%98%E5%8C%96.html</loc>
+    
+    <lastmod>2020-12-11</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.for-dba.com/go-sendmail.html</loc>
+    
+    <lastmod>2020-12-11</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.for-dba.com/ceph%E6%95%85%E9%9A%9C%E6%B1%87%E6%80%BB.html</loc>
+    
+    <lastmod>2020-12-11</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.for-dba.com/ceph-k8s%E4%BD%BF%E7%94%A8ceph%E5%AD%98%E5%82%A8.html</loc>
     
     <lastmod>2020-12-11</lastmod>
     
@@ -65,7 +107,14 @@
   </url>
   
   <url>
-    <loc>https://www.for-dba.com/ceph-k8s%E4%BD%BF%E7%94%A8ceph%E5%AD%98%E5%82%A8.html</loc>
+    <loc>https://www.for-dba.com/centos7%E5%AE%89%E8%A3%85ceph%E9%9B%86%E7%BE%A4.html</loc>
+    
+    <lastmod>2020-12-11</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.for-dba.com/prometheus/index.html</loc>
     
     <lastmod>2020-12-11</lastmod>
     
@@ -93,20 +142,6 @@
   </url>
   
   <url>
-    <loc>https://www.for-dba.com/centos7%E5%AE%89%E8%A3%85ceph%E9%9B%86%E7%BE%A4.html</loc>
-    
-    <lastmod>2020-12-10</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://www.for-dba.com/prometheus/index.html</loc>
-    
-    <lastmod>2020-12-09</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://www.for-dba.com/ceph/index.html</loc>
     
     <lastmod>2020-12-04</lastmod>
@@ -117,13 +152,6 @@
     <loc>https://www.for-dba.com/golang/index.html</loc>
     
     <lastmod>2020-12-04</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://www.for-dba.com/ceph%E6%95%85%E9%9A%9C%E6%B1%87%E6%80%BB.html</loc>
-    
-    <lastmod>2020-11-30</lastmod>
     
   </url>
   
@@ -145,27 +173,6 @@
     <loc>https://www.for-dba.com/categories/index.html</loc>
     
     <lastmod>2020-11-27</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://www.for-dba.com/go-sendmail.html</loc>
-    
-    <lastmod>2020-11-27</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://www.for-dba.com/kubernetes-resource-limit.html</loc>
-    
-    <lastmod>2020-11-27</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://www.for-dba.com/etcd-%E4%BC%98%E5%8C%96.html</loc>
-    
-    <lastmod>2020-11-25</lastmod>
     
   </url>
   
@@ -243,6 +250,13 @@
   
   <url>
     <loc>https://www.for-dba.com/tags/tool/</loc>
+    <lastmod>2020-12-11</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.for-dba.com/tags/exporter/</loc>
     <lastmod>2020-12-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
