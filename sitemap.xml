@@ -9,6 +9,27 @@
   </url>
   
   <url>
+    <loc>https://www.for-dba.com/ceph/index.html</loc>
+    
+    <lastmod>2020-12-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.for-dba.com/ceph%E6%95%85%E9%9A%9C%E6%B1%87%E6%80%BB.html</loc>
+    
+    <lastmod>2020-12-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.for-dba.com/ceph-theory-add-osd-node.html</loc>
+    
+    <lastmod>2020-12-15</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://www.for-dba.com/ceph-stuck-active-remapped-1.html</loc>
     
     <lastmod>2020-12-15</lastmod>
@@ -100,21 +121,7 @@
   </url>
   
   <url>
-    <loc>https://www.for-dba.com/ceph%E6%95%85%E9%9A%9C%E6%B1%87%E6%80%BB.html</loc>
-    
-    <lastmod>2020-12-15</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://www.for-dba.com/etcd-%E4%BC%98%E5%8C%96.html</loc>
-    
-    <lastmod>2020-12-15</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://www.for-dba.com/ceph-theory-add-osd-node.html</loc>
     
     <lastmod>2020-12-15</lastmod>
     
@@ -187,13 +194,6 @@
     <loc>https://www.for-dba.com/linux/index.html</loc>
     
     <lastmod>2020-12-10</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://www.for-dba.com/ceph/index.html</loc>
-    
-    <lastmod>2020-12-04</lastmod>
     
   </url>
   
