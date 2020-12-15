@@ -1,3 +1,4 @@
+https://www.for-dba.com/ceph-problem-monitor-failed.html
 https://www.for-dba.com/ceph-stuck-active-remapped-1.html
 https://www.for-dba.com/ceph-problem-cannot-mount-cephfs.html
 https://www.for-dba.com/ceph-theory-add-osd-node.html
@@ -15,7 +16,6 @@ https://www.for-dba.com/kubernetes-make-nginx.html
 https://www.for-dba.com/prometheus-relabels.html
 https://www.for-dba.com/ceph-mds.html
 https://www.for-dba.com/ceph-k8s%E4%BD%BF%E7%94%A8ceph%E5%AD%98%E5%82%A8.html
-https://www.for-dba.com/ceph%E6%95%85%E9%9A%9C%E6%B1%87%E6%80%BB.html
 https://www.for-dba.com/centos7%E5%AE%89%E8%A3%85ceph%E9%9B%86%E7%BE%A4.html
 https://www.for-dba.com/go-sendmail.html
 https://www.for-dba.com/kubernetes-resource-limit.html
