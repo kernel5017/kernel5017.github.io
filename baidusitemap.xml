@@ -5,10 +5,6 @@
     <lastmod>2020-12-16</lastmod>
   </url>
   <url>
-    <loc>https://www.for-dba.com/mysql-theory-replicate-event.html</loc>
-    <lastmod>2020-12-16</lastmod>
-  </url>
-  <url>
     <loc>https://www.for-dba.com/prometheus-relabels2.html</loc>
     <lastmod>2020-12-16</lastmod>
   </url>
@@ -25,11 +21,15 @@
     <lastmod>2020-12-16</lastmod>
   </url>
   <url>
-    <loc>https://www.for-dba.com/linux-tool-sysbench.html</loc>
+    <loc>https://www.for-dba.com/mysql-theory-replicate-event.html</loc>
     <lastmod>2020-12-16</lastmod>
   </url>
   <url>
     <loc>https://www.for-dba.com/mysql-theory-replicate-event-fd.html</loc>
+    <lastmod>2020-12-16</lastmod>
+  </url>
+  <url>
+    <loc>https://www.for-dba.com/linux-tool-sysbench.html</loc>
     <lastmod>2020-12-16</lastmod>
   </url>
   <url>
@@ -89,11 +89,11 @@
     <lastmod>2020-12-16</lastmod>
   </url>
   <url>
-    <loc>https://www.for-dba.com/ceph-k8s%E4%BD%BF%E7%94%A8ceph%E5%AD%98%E5%82%A8.html</loc>
+    <loc>https://www.for-dba.com/ceph-mds-deploy.html</loc>
     <lastmod>2020-12-16</lastmod>
   </url>
   <url>
-    <loc>https://www.for-dba.com/ceph-mds-deploy.html</loc>
+    <loc>https://www.for-dba.com/ceph-k8s%E4%BD%BF%E7%94%A8ceph%E5%AD%98%E5%82%A8.html</loc>
     <lastmod>2020-12-16</lastmod>
   </url>
   <url>
