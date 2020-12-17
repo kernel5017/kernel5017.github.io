@@ -1,0 +1,487 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ceph-theory-OsdAndPg | 豪仔的老爹</title><meta name="author" content="豪仔的老爹"><meta name="copyright" content="豪仔的老爹"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><meta name="description" content="OSD status一个OSD的status有以下几种：  in: in the cluster out: out of the cluster up: up and running down: not running     上一个状态 当前状态 行为动作    in out ceph will migrate PGs to other OSDs   in&#x2F;out out ceph will n">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ceph-theory-OsdAndPg">
+<meta property="og:url" content="https://www.for-dba.com/ceph-theory-OsdAndPg.html">
+<meta property="og:site_name" content="豪仔的老爹">
+<meta property="og:description" content="OSD status一个OSD的status有以下几种：  in: in the cluster out: out of the cluster up: up and running down: not running     上一个状态 当前状态 行为动作    in out ceph will migrate PGs to other OSDs   in&#x2F;out out ceph will n">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg">
+<meta property="article:published_time" content="2020-12-17T09:19:18.000Z">
+<meta property="article:modified_time" content="2020-12-17T09:20:47.866Z">
+<meta property="article:author" content="豪仔的老爹">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://www.for-dba.com/ceph-theory-OsdAndPg"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  ClickShowText: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+};
+
+var saveToLocal = {
+  set: function setWithExpiry(key, value, ttl) {
+    const now = new Date()
+    const expiryDay = ttl * 86400000
+    const item = {
+      value: value,
+      expiry: now.getTime() + expiryDay,
+    }
+    localStorage.setItem(key, JSON.stringify(item))
+  },
+
+  get: function getWithExpiry(key) {
+    const itemStr = localStorage.getItem(key)
+
+    if (!itemStr) {
+      return undefined
+    }
+    const item = JSON.parse(itemStr)
+    const now = new Date()
+
+    if (now.getTime() > item.expiry) {
+      localStorage.removeItem(key)
+      return undefined
+    }
+    return item.value
+  }
+}
+
+// https://stackoverflow.com/questions/16839698/jquery-getscript-alternative-in-native-javascript
+const getScript = url => new Promise((resolve, reject) => {
+  const script = document.createElement('script')
+  script.src = url
+  script.async = true
+  script.onerror = reject
+  script.onload = script.onreadystatechange = function() {
+    const loadState = this.readyState
+    if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+    script.onload = script.onreadystatechange = null
+    resolve()
+  }
+  document.head.appendChild(script)
+})</script><script id="config_change">var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2020-12-17 17:20:47'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(function () {  window.activateDarkMode = function () {
+    document.documentElement.setAttribute('data-theme', 'dark')
+    if (document.querySelector('meta[name="theme-color"]') !== null) {
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+    }
+  }
+  window.activateLightMode = function () {
+    document.documentElement.setAttribute('data-theme', 'light')
+   if (document.querySelector('meta[name="theme-color"]') !== null) {
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+    }
+  }
+  const autoChangeMode = 'false'
+  const t = saveToLocal.get('theme')
+  if (autoChangeMode === '1') {
+    const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+    const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+    const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+    if (t === undefined) {
+      if (isLightMode) activateLightMode()
+      else if (isDarkMode) activateDarkMode()
+      else if (isNotSpecified || hasNoSupport) {
+        const now = new Date()
+        const hour = now.getHours()
+        const isNight = hour <= 6 || hour >= 18
+        isNight ? activateDarkMode() : activateLightMode()
+      }
+      window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+        if (saveToLocal.get('theme') === undefined) {
+          e.matches ? activateDarkMode() : activateLightMode()
+        }
+      })
+    } else if (t === 'light') activateLightMode()
+    else activateDarkMode()
+  } else if (autoChangeMode === '2') {
+    const now = new Date()
+    const hour = now.getHours()
+    const isNight = hour <= 6 || hour >= 18
+    if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+    else if (t === 'light') activateLightMode()
+    else activateDarkMode()
+  } else {
+    if (t === 'dark') activateDarkMode()
+    else if (t === 'light') activateLightMode()
+  }const asideStatus = saveToLocal.get('aside-status')
+if (asideStatus !== undefined) {
+   if (asideStatus === 'hide') {
+     document.documentElement.classList.add('hide-aside')
+   } else {
+     document.documentElement.classList.remove('hide-aside')
+   }
+}})()</script><meta name="generator" content="Hexo 5.2.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" src="https://5017-1304333899.cos.ap-beijing.myqcloud.com/webwxgetmsgimg.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">28</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">15</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">7</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 数据库&amp;存储</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/mysql/index.html"><span> MySQL</span></a></li><li><a class="site-page" href="/categories/etcd/"><span> ETCD</span></a></li><li><a class="site-page" href="/categories/redis/"><span> Redis</span></a></li><li><a class="site-page" href="/ceph/index.html"><span> Ceph</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> Linux</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/linux/index.html"><span> Linux</span></a></li><li><a class="site-page" href="/shell/index.html"><span> Shell</span></a></li><li><a class="site-page" href="/categories/iptables/"><span> Iptables</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> Kubernetes</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/categories/rke/"><span> rke</span></a></li><li><a class="site-page" href="/kubernetes/index.html"><span> kubernetes</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 监控</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/prometheus/index.html"><span> Prometheus</span></a></li><li><a class="site-page" href="/categories/grafana/"><span> Grafana</span></a></li><li><a class="site-page" href="/categories/alertmanager/"><span> AlertMnager</span></a></li><li><a class="site-page" href="/categories/zabbix/"><span> Zabbix</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 开发</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/golang/index.html"><span> Golang</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(https://5017-1304333899.cos.ap-beijing.myqcloud.com/picture/19.jpg)"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">豪仔的老爹</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 数据库&amp;存储</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/mysql/index.html"><span> MySQL</span></a></li><li><a class="site-page" href="/categories/etcd/"><span> ETCD</span></a></li><li><a class="site-page" href="/categories/redis/"><span> Redis</span></a></li><li><a class="site-page" href="/ceph/index.html"><span> Ceph</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> Linux</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/linux/index.html"><span> Linux</span></a></li><li><a class="site-page" href="/shell/index.html"><span> Shell</span></a></li><li><a class="site-page" href="/categories/iptables/"><span> Iptables</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> Kubernetes</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/categories/rke/"><span> rke</span></a></li><li><a class="site-page" href="/kubernetes/index.html"><span> kubernetes</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 监控</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/prometheus/index.html"><span> Prometheus</span></a></li><li><a class="site-page" href="/categories/grafana/"><span> Grafana</span></a></li><li><a class="site-page" href="/categories/alertmanager/"><span> AlertMnager</span></a></li><li><a class="site-page" href="/categories/zabbix/"><span> Zabbix</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 开发</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/golang/index.html"><span> Golang</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">ceph-theory-OsdAndPg</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2020-12-17T09:19:18.000Z" title="Created 2020-12-17 17:19:18">2020-12-17</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2020-12-17T09:20:47.866Z" title="Updated 2020-12-17 17:20:47">2020-12-17</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/ceph/">ceph</a></span></div><div class="meta-secondline"> <span class="post-meta-separator">|</span><span class="post-meta-pv-cv"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="OSD-status"><a href="#OSD-status" class="headerlink" title="OSD status"></a>OSD status</h2><p>一个OSD的status有以下几种：</p>
+<ul>
+<li><strong>in</strong>: in the cluster</li>
+<li><strong>out</strong>: out of the cluster</li>
+<li><strong>up</strong>: up and running</li>
+<li><strong>down</strong>: not running</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>上一个状态</th>
+<th>当前状态</th>
+<th>行为动作</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>in</td>
+<td>out</td>
+<td>ceph will migrate PGs to other OSDs</td>
+</tr>
+<tr>
+<td>in/out</td>
+<td>out</td>
+<td>ceph will not assign PGs to this OSD</td>
+</tr>
+</tbody></table>
+<h2 id="ceph-is-NOT-Health-OK"><a href="#ceph-is-NOT-Health-OK" class="headerlink" title="ceph is NOT Health_OK"></a>ceph is NOT Health_OK</h2><p>如果你的ceph集群不是Health_OK状态，那么可能有以下几种情况：</p>
+<ul>
+<li>You <code>haven&#39;t started</code> the cluster yet</li>
+<li>The OSDs are in the peering <code>when you just started/restart</code> the cluster</li>
+<li>You just <code>added/removed</code> an OSD</li>
+<li>You just have <code>modified</code> your cluster map</li>
+</ul>
+<h2 id="检查osd状态常用命令"><a href="#检查osd状态常用命令" class="headerlink" title="检查osd状态常用命令"></a>检查osd状态常用命令</h2><ul>
+<li>ceph osd stat</li>
+<li>ceph osd tree</li>
+<li>ceph osd df</li>
+</ul>
+<h2 id="PG-Sets"><a href="#PG-Sets" class="headerlink" title="PG Sets"></a>PG Sets</h2><ul>
+<li><p>If a POOL requires 3 replicas of a PG, CRUSH may assign them to osd.1, osd.2, osd.3</p>
+</li>
+<li><p>CRUSH seeks a pseudo-random placement that will take into account failure domains you set in CRUSH MAP</p>
+</li>
+<li><p>Acting Set</p>
+</li>
+<li><ul>
+<li>As a set of OSDs that contain the replicas of a PG</li>
+</ul>
+</li>
+</ul>
+<h2 id="When-a-OSD-in-Acting-Set-is-down"><a href="#When-a-OSD-in-Acting-Set-is-down" class="headerlink" title="When a OSD in Acting Set is down"></a>When a OSD in Acting Set is down</h2><table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Ceph Behavior</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>When You <strong>added</strong> or <strong>removed</strong> an OSD</td>
+<td>Ceph reassigned the PGs to other OSDs==&gt; Changing the composition of the Acting Set==&gt; Spawning the migration of data with “backfill” process</td>
+<td></td>
+</tr>
+<tr>
+<td>When OSD was down, was restarted</td>
+<td>Ceph is now recovering</td>
+<td></td>
+</tr>
+<tr>
+<td>An OSD in the Acting Set is down or unable to service requests</td>
+<td>Another OSD has temporarily assumed it duties</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id="Up-Set"><a href="#Up-Set" class="headerlink" title="Up Set"></a>Up Set</h2><p><strong>Up set</strong>: the set of OSDs that will actually handle the requests。</p>
+<p>Up Set和Acting Set世纪上是相同的。</p>
+<table>
+<thead>
+<tr>
+<th>When</th>
+<th>Ceph Behavior</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Up Set != Acting Set</td>
+<td>1.Ceph is migrating Data<br />2.An OSD is recovering<br />3.The cluster is rebalancing itself<br />4.Problem: HEALTHY WARN with “stuck state”</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id="Check-PG-Status"><a href="#Check-PG-Status" class="headerlink" title="Check PG Status"></a>Check PG Status</h2><p>PG ID的格式为：{pool-num}.{pg-id}</p>
+<p>比如6.39===&gt; pool 6, id 39</p>
+<ul>
+<li><p>列出所有PG</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">[root@ceph1]#</span><span class="bash"> ceph pg dump</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查看PG对应的acting set或up set</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">[root@ceph1]#</span><span class="bash"> ceph pg map 2.d</span></span><br><span class="line">osdmap e571 pg 2.d (2.d) -&gt; up [0,2,3] acting [0,2,3]</span><br></pre></td></tr></table></figure>
+
+<p>pg2.d对应的acting set和up set为osd.0,osd.2,osd.3</p>
+</li>
+</ul>
+<h2 id="要点"><a href="#要点" class="headerlink" title="要点"></a>要点</h2><h3 id="peering"><a href="#peering" class="headerlink" title="peering"></a>peering</h3><ul>
+<li>写入data之前，PG的状态必须是active+clean，所以必须让这个PG内的所有OSD Daemons都同意目前的状态。这个验证同意的工作在ceph的设计里称之为peering<ul>
+<li>做法：就是让PG中Acting set中的第一个OSD(Primary OSD)向second OSD,third OSD进行验证active+clean状态</li>
+</ul>
+</li>
+<li>peer完毕后，OSDs也会将状态汇报给Monitor</li>
+</ul>
+<h2 id="PG-Status"><a href="#PG-Status" class="headerlink" title="PG Status"></a>PG Status</h2><p>Ceph does NOT HEALTH_OK</p>
+<table>
+<thead>
+<tr>
+<th>When</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>[<strong>Pool</strong>] Just create a pool and PG haven’t peered yet</td>
+<td></td>
+</tr>
+<tr>
+<td>[<strong>Recovering</strong>] The PG are recovering</td>
+<td></td>
+</tr>
+<tr>
+<td>[<strong>OSD</strong>] Just added an OSD or removed an OSD</td>
+<td></td>
+</tr>
+<tr>
+<td>[<strong>CRUSHMap</strong>] Just modified the CRUSH map and your PG are migrating</td>
+<td></td>
+</tr>
+<tr>
+<td>[<strong>Status error</strong>] There is inconsistent data in different replicas of a PG</td>
+<td></td>
+</tr>
+<tr>
+<td>Ceph is scrubbing a PG’s replicas</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id="check-PG-Stat"><a href="#check-PG-Stat" class="headerlink" title="check PG Stat"></a>check PG Stat</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root@ceph1 mysql]# ceph pg stat</span><br><span class="line">v167207: 320   //总共的pg数量</span><br><span class="line">pgs: 320 active+clean;    //处于active+clean的PG的数量</span><br><span class="line">10026 MB data, 			  //capacity</span><br><span class="line">51132 MB used, 2</span><br><span class="line">4826 MB / 80118 MB avail</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="List-pool"><a href="#List-pool" class="headerlink" title="List pool"></a>List pool</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@ceph1 mysql]# ceph osd lspools</span><br><span class="line">0 rbd,1 fs_data,2 fs_metadata,</span><br><span class="line"></span><br><span class="line">总共3个pool</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="The-output-format-of-the-placement-group"><a href="#The-output-format-of-the-placement-group" class="headerlink" title="The output format of the placement group"></a>The output format of the placement group</h2><table>
+<thead>
+<tr>
+<th>Format</th>
+<th>Command</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>JSON format</td>
+<td>ceph pg dump -o {filename} –format=json</td>
+</tr>
+<tr>
+<td>Query PG</td>
+<td>ceph pg {poolnum}.{pg-id} query</td>
+</tr>
+</tbody></table>
+<p><img src="https://5017-1304333899.cos.ap-beijing.myqcloud.com/ceph-theory-OsdAndPg/image-20201217163941641.png" alt="image-20201217163941641"></p>
+<h2 id="Creating-PG"><a href="#Creating-PG" class="headerlink" title="Creating PG"></a>Creating PG</h2><p><img src="https://5017-1304333899.cos.ap-beijing.myqcloud.com/ceph-theory-OsdAndPg/image-20201217164047587.png" alt="image-20201217164047587"></p>
+<p><img src="https://5017-1304333899.cos.ap-beijing.myqcloud.com/ceph-theory-OsdAndPg/image-20201217164112978.png" alt="image-20201217164112978"></p>
+<h2 id="状态"><a href="#状态" class="headerlink" title="状态"></a>状态</h2><h3 id="peering-1"><a href="#peering-1" class="headerlink" title="peering"></a>peering</h3><p>When Ceph is Peering a placement group, Ceph is bring the OSDs that store the replicas of the placement group into agreement about the state of the object and metadata in the placement group</p>
+<p><img src="https://5017-1304333899.cos.ap-beijing.myqcloud.com/ceph-theory-OsdAndPg/image-20201217164239933.png" alt="image-20201217164239933"></p>
+<h3 id="Activing"><a href="#Activing" class="headerlink" title="Activing"></a>Activing</h3><ul>
+<li><p>When a <strong>PG</strong> is in the active state.</p>
+</li>
+<li><ul>
+<li>The data in the <strong>PG</strong> is generally available in the primary placement group and the replicas for read and write operations</li>
+</ul>
+</li>
+</ul>
+<p>当一个PG处于active状态，表示这个PG的primary placement group已经处于可用状态，且replicas做好读写准备</p>
+<h3 id="Clean"><a href="#Clean" class="headerlink" title="Clean"></a>Clean</h3><ul>
+<li><p>When a <strong>PG</strong> is in the <strong>clean state</strong>,</p>
+</li>
+<li><ul>
+<li>The primary OSD and the replica OSDs have successfully peered</li>
+<li>There are no stray replicas for the <strong>PG</strong> //满足replica指定的值，所以pg都映射到了指定数量的OSD</li>
+<li>Ceph replicated all objects in the <strong>PG</strong> the correct number of times //PG中的所有objects都被复制了正确的数量</li>
+</ul>
+</li>
+</ul>
+<h3 id="Degraded"><a href="#Degraded" class="headerlink" title="Degraded"></a>Degraded</h3><p>A primary OSD writes the object to storage, the PG will remain in a degraded state until the primary OSD has received an acknowledgement from the replica OSDs that Ceph created the replica objects successfully。</p>
+<p>如果PG中的object没有被复制够规定的数量，就会出现这个状态。比如replicas=3,但是pg只有两份</p>
+<h3 id="Active-degraded"><a href="#Active-degraded" class="headerlink" title="Active+ degraded"></a>Active+ degraded</h3><ul>
+<li>An OSD may be active even though it doesn’t hold all of the objects yet</li>
+<li>If an OSD goes down, Ceph marks each <strong>PG</strong> assigned to the OSD as degraded</li>
+</ul>
+<h3 id="Recovering"><a href="#Recovering" class="headerlink" title="Recovering"></a>Recovering</h3><ul>
+<li>When an OSD goes down, its contents may fail behind the current state of other replicas in the PG</li>
+<li>Ceph was designed for fault-tolerance at a scale where hardware and software problems are ongoing</li>
+</ul>
+<p>表示objects正在replica之间进行同步/迁移</p>
+<h3 id="Backing-Filling"><a href="#Backing-Filling" class="headerlink" title="Backing Filling"></a>Backing Filling</h3><ul>
+<li>When a new OSD joins the cluster, CRUSH will assign PG from OSDs in the cluster to the newly added OSD</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>backfill_wait</td>
+<td>a backfill operation is pending</td>
+</tr>
+<tr>
+<td>backfill</td>
+<td>a backfill operation is underway</td>
+</tr>
+<tr>
+<td>backfill_too_full</td>
+<td>a backfill operation was requested, but couldn’t be completed due to insufficient storage capacity</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>Setup</th>
+<th>Behavior</th>
+<th>Default Value</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>osd max backfills</td>
+<td>the maximum number of concurrent backfills to or from an OSD</td>
+<td>10</td>
+</tr>
+<tr>
+<td>osd backfill full ratio</td>
+<td>Enables an OSD to refuse a backfill request if the OSD is approaching its its full ratio (85%, by default).</td>
+<td>85%</td>
+</tr>
+</tbody></table>
+<h3 id="Remapped"><a href="#Remapped" class="headerlink" title="Remapped"></a>Remapped</h3><p>When the Acting Set that services a PG changes, the data migrates from the old acting set to the new acting set。</p>
+<p>the PG is temporarily mapped to a different set of OSDs from what CRUSH specified</p>
+<h3 id="Stale"><a href="#Stale" class="headerlink" title="Stale"></a>Stale</h3><ul>
+<li><p>The ceph-osd daemons may also get into a stuck state where they aren’t reporting statistics in a timely manner (e.g., a temporary network fault) while Ceph uses heartbeat to ensure the system are running</p>
+</li>
+<li><ul>
+<li>If the primary OSD of a placement group’s acting set fails to report to the monitor or</li>
+<li>If other OSDs have reported the primary OSDs down</li>
+</ul>
+</li>
+</ul>
+<p>==&gt; the monitor will mark the placement group stale</p>
+<p>the PG is in an unknown state - the monitors have not received an update for it since the PG mapping changed.</p>
+<h2 id="Identifying-Troubled-PGs"><a href="#Identifying-Troubled-PGs" class="headerlink" title="Identifying Troubled PGs"></a>Identifying Troubled PGs</h2><table>
+<thead>
+<tr>
+<th>State</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Unclean</td>
+<td>Placement groups contain objects that are not replicated the desired number of times. They should be recovering</td>
+</tr>
+<tr>
+<td>InActive</td>
+<td>Placement groups cannot process reads or writes because they are waiting for an OSD with the most up-to-date data to come back up.</td>
+</tr>
+<tr>
+<td>Stale</td>
+<td>Placement groups are in an unknown state, because the OSDs that host them have not reported to the monitor cluster in a while (configured by mon osd report timeout).</td>
+</tr>
+</tbody></table>
+<p>ceph pg dump_stuck [unclean | inactive | stale]</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="mailto:undefined">豪仔的老爹</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="https://www.for-dba.com/ceph-theory-OsdAndPg.html">https://www.for-dba.com/ceph-theory-OsdAndPg.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"><div class="social-share" data-image="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/ceph-theory-PG.html"><img class="next-cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">ceph-theory-PG</div></div></a></div></nav><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> Comment</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside_content" id="aside_content"><div class="card-widget card-info"><div class="card-content"><div class="card-info-avatar is-center"><img class="avatar-img" src="https://5017-1304333899.cos.ap-beijing.myqcloud.com/webwxgetmsgimg.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/><div class="author-info__name">豪仔的老爹</div><div class="author-info__description"></div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">28</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">15</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">7</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div></div><div class="card-widget card-announcement"><div class="card-content"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>Announcement</span></div><div class="announcement_content">邮件交流：365084797@qq.com</div></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="card-content"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#OSD-status"><span class="toc-number">1.</span> <span class="toc-text">OSD status</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ceph-is-NOT-Health-OK"><span class="toc-number">2.</span> <span class="toc-text">ceph is NOT Health_OK</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A3%80%E6%9F%A5osd%E7%8A%B6%E6%80%81%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4"><span class="toc-number">3.</span> <span class="toc-text">检查osd状态常用命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#PG-Sets"><span class="toc-number">4.</span> <span class="toc-text">PG Sets</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#When-a-OSD-in-Acting-Set-is-down"><span class="toc-number">5.</span> <span class="toc-text">When a OSD in Acting Set is down</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Up-Set"><span class="toc-number">6.</span> <span class="toc-text">Up Set</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Check-PG-Status"><span class="toc-number">7.</span> <span class="toc-text">Check PG Status</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A6%81%E7%82%B9"><span class="toc-number">8.</span> <span class="toc-text">要点</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#peering"><span class="toc-number">8.1.</span> <span class="toc-text">peering</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#PG-Status"><span class="toc-number">9.</span> <span class="toc-text">PG Status</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#check-PG-Stat"><span class="toc-number">10.</span> <span class="toc-text">check PG Stat</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#List-pool"><span class="toc-number">11.</span> <span class="toc-text">List pool</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#The-output-format-of-the-placement-group"><span class="toc-number">12.</span> <span class="toc-text">The output format of the placement group</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Creating-PG"><span class="toc-number">13.</span> <span class="toc-text">Creating PG</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%8A%B6%E6%80%81"><span class="toc-number">14.</span> <span class="toc-text">状态</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#peering-1"><span class="toc-number">14.1.</span> <span class="toc-text">peering</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Activing"><span class="toc-number">14.2.</span> <span class="toc-text">Activing</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Clean"><span class="toc-number">14.3.</span> <span class="toc-text">Clean</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Degraded"><span class="toc-number">14.4.</span> <span class="toc-text">Degraded</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Active-degraded"><span class="toc-number">14.5.</span> <span class="toc-text">Active+ degraded</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Recovering"><span class="toc-number">14.6.</span> <span class="toc-text">Recovering</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Backing-Filling"><span class="toc-number">14.7.</span> <span class="toc-text">Backing Filling</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Remapped"><span class="toc-number">14.8.</span> <span class="toc-text">Remapped</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Stale"><span class="toc-number">14.9.</span> <span class="toc-text">Stale</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Identifying-Troubled-PGs"><span class="toc-number">15.</span> <span class="toc-text">Identifying Troubled PGs</span></a></li></ol></div></div></div><div class="card-widget card-recent-post"><div class="card-content"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/ceph-theory-OsdAndPg.html" title="ceph-theory-OsdAndPg">ceph-theory-OsdAndPg</a><time datetime="2020-12-17T09:19:18.000Z" title="Created 2020-12-17 17:19:18">2020-12-17</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/ceph-theory-PG.html" title="ceph-theory-PG">ceph-theory-PG</a><time datetime="2020-12-17T07:34:35.000Z" title="Created 2020-12-17 15:34:35">2020-12-17</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/mysql-theory-replicate-event-pg.html" title="mysql-theory-replicate-event-pg">mysql-theory-replicate-event-pg</a><time datetime="2020-12-16T09:16:37.000Z" title="Created 2020-12-16 17:16:37">2020-12-16</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/mysql-theory-replicate-event-fd.html" title="mysql-theory-replicate-event-fd">mysql-theory-replicate-event-fd</a><time datetime="2020-12-16T07:26:07.000Z" title="Created 2020-12-16 15:26:07">2020-12-16</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/mysql-theory-replicate-event.html" title="mysql主从复制-event格式">mysql主从复制-event格式</a><time datetime="2020-12-16T07:03:24.000Z" title="Created 2020-12-16 15:03:24">2020-12-16</time></div></div></div></div></div></div></div></main><footer id="footer" style="background-image: url(https://5017-1304333899.cos.ap-beijing.myqcloud.com/picture/19.jpg)"><div id="footer-wrap"><div class="copyright">&copy;2020 By 豪仔的老爹</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="Scroll To Comments"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="Back To Top"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    let initData = {
+      el: '#vcomment',
+      appId: '8pmThnDCYUdGoOgLWsVPzKOI-gzGzoHsz',
+      appKey: 'nt3vchWbGYf7q7Txb7PjAu1B',
+      placeholder: 'Please leave your footprints',
+      avatar: 'monsterid',
+      meta: 'nick,mail,link'.split(','),
+      pageSize: '10',
+      lang: 'en',
+      recordIP: false,
+      serverURLs: '',
+      emojiCDN: '',
+      emojiMaps: "",
+      enableQQ: false,
+      path: window.location.pathname,
+    }
+
+    if (true) { 
+      initData.requiredFields= ('nick,mail'.split(','))
+    }
+    
+    if (false) {
+      const otherData = false
+      initData = Object.assign({}, initData, otherData)
+    }
+    
+    const valine = new Valine(initData)
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
+
+if ('Valine' === 'Valine' || !false) {
+  if (false) btf.loadComment(document.querySelector('#vcomment'),loadValine)
+  else setTimeout(() => loadValine(), 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="99" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/canvas-nest.min.js"></script><script id="click-heart" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/click-heart.min.js" async="async" mobile="false"></script></div></body></html>

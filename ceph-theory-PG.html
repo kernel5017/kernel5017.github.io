@@ -1,0 +1,295 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ceph-theory-PG | 豪仔的老爹</title><meta name="keywords" content="ceph pg"><meta name="author" content="豪仔的老爹"><meta name="copyright" content="豪仔的老爹"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><meta name="description" content="​    PG全名placement group。当向ceph cluster中存放数据时，objects会映射到一个个的PG中，每个PG又会映射到一个个的OSD。我们把objects映射到PG中，这样就大大减少我们需要跟踪的每个object元数据和需要运行的进程的数量。增加PG的数量可以减少OSD的负载，可以减少计算的成本。但是每个PG在存储它的osd上需要更多的CPU和内存，因为每个PG本身也">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ceph-theory-PG">
+<meta property="og:url" content="https://www.for-dba.com/ceph-theory-PG.html">
+<meta property="og:site_name" content="豪仔的老爹">
+<meta property="og:description" content="​    PG全名placement group。当向ceph cluster中存放数据时，objects会映射到一个个的PG中，每个PG又会映射到一个个的OSD。我们把objects映射到PG中，这样就大大减少我们需要跟踪的每个object元数据和需要运行的进程的数量。增加PG的数量可以减少OSD的负载，可以减少计算的成本。但是每个PG在存储它的osd上需要更多的CPU和内存，因为每个PG本身也">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg">
+<meta property="article:published_time" content="2020-12-17T07:34:35.000Z">
+<meta property="article:modified_time" content="2020-12-17T09:20:47.867Z">
+<meta property="article:author" content="豪仔的老爹">
+<meta property="article:tag" content="ceph pg">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://www.for-dba.com/ceph-theory-PG"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  ClickShowText: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+};
+
+var saveToLocal = {
+  set: function setWithExpiry(key, value, ttl) {
+    const now = new Date()
+    const expiryDay = ttl * 86400000
+    const item = {
+      value: value,
+      expiry: now.getTime() + expiryDay,
+    }
+    localStorage.setItem(key, JSON.stringify(item))
+  },
+
+  get: function getWithExpiry(key) {
+    const itemStr = localStorage.getItem(key)
+
+    if (!itemStr) {
+      return undefined
+    }
+    const item = JSON.parse(itemStr)
+    const now = new Date()
+
+    if (now.getTime() > item.expiry) {
+      localStorage.removeItem(key)
+      return undefined
+    }
+    return item.value
+  }
+}
+
+// https://stackoverflow.com/questions/16839698/jquery-getscript-alternative-in-native-javascript
+const getScript = url => new Promise((resolve, reject) => {
+  const script = document.createElement('script')
+  script.src = url
+  script.async = true
+  script.onerror = reject
+  script.onload = script.onreadystatechange = function() {
+    const loadState = this.readyState
+    if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+    script.onload = script.onreadystatechange = null
+    resolve()
+  }
+  document.head.appendChild(script)
+})</script><script id="config_change">var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2020-12-17 17:20:47'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(function () {  window.activateDarkMode = function () {
+    document.documentElement.setAttribute('data-theme', 'dark')
+    if (document.querySelector('meta[name="theme-color"]') !== null) {
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+    }
+  }
+  window.activateLightMode = function () {
+    document.documentElement.setAttribute('data-theme', 'light')
+   if (document.querySelector('meta[name="theme-color"]') !== null) {
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+    }
+  }
+  const autoChangeMode = 'false'
+  const t = saveToLocal.get('theme')
+  if (autoChangeMode === '1') {
+    const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+    const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+    const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+    if (t === undefined) {
+      if (isLightMode) activateLightMode()
+      else if (isDarkMode) activateDarkMode()
+      else if (isNotSpecified || hasNoSupport) {
+        const now = new Date()
+        const hour = now.getHours()
+        const isNight = hour <= 6 || hour >= 18
+        isNight ? activateDarkMode() : activateLightMode()
+      }
+      window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+        if (saveToLocal.get('theme') === undefined) {
+          e.matches ? activateDarkMode() : activateLightMode()
+        }
+      })
+    } else if (t === 'light') activateLightMode()
+    else activateDarkMode()
+  } else if (autoChangeMode === '2') {
+    const now = new Date()
+    const hour = now.getHours()
+    const isNight = hour <= 6 || hour >= 18
+    if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+    else if (t === 'light') activateLightMode()
+    else activateDarkMode()
+  } else {
+    if (t === 'dark') activateDarkMode()
+    else if (t === 'light') activateLightMode()
+  }const asideStatus = saveToLocal.get('aside-status')
+if (asideStatus !== undefined) {
+   if (asideStatus === 'hide') {
+     document.documentElement.classList.add('hide-aside')
+   } else {
+     document.documentElement.classList.remove('hide-aside')
+   }
+}})()</script><meta name="generator" content="Hexo 5.2.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" src="https://5017-1304333899.cos.ap-beijing.myqcloud.com/webwxgetmsgimg.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">28</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">15</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">7</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 数据库&amp;存储</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/mysql/index.html"><span> MySQL</span></a></li><li><a class="site-page" href="/categories/etcd/"><span> ETCD</span></a></li><li><a class="site-page" href="/categories/redis/"><span> Redis</span></a></li><li><a class="site-page" href="/ceph/index.html"><span> Ceph</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> Linux</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/linux/index.html"><span> Linux</span></a></li><li><a class="site-page" href="/shell/index.html"><span> Shell</span></a></li><li><a class="site-page" href="/categories/iptables/"><span> Iptables</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> Kubernetes</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/categories/rke/"><span> rke</span></a></li><li><a class="site-page" href="/kubernetes/index.html"><span> kubernetes</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 监控</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/prometheus/index.html"><span> Prometheus</span></a></li><li><a class="site-page" href="/categories/grafana/"><span> Grafana</span></a></li><li><a class="site-page" href="/categories/alertmanager/"><span> AlertMnager</span></a></li><li><a class="site-page" href="/categories/zabbix/"><span> Zabbix</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 开发</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/golang/index.html"><span> Golang</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(https://5017-1304333899.cos.ap-beijing.myqcloud.com/picture/6.jpg)"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">豪仔的老爹</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 数据库&amp;存储</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/mysql/index.html"><span> MySQL</span></a></li><li><a class="site-page" href="/categories/etcd/"><span> ETCD</span></a></li><li><a class="site-page" href="/categories/redis/"><span> Redis</span></a></li><li><a class="site-page" href="/ceph/index.html"><span> Ceph</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> Linux</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/linux/index.html"><span> Linux</span></a></li><li><a class="site-page" href="/shell/index.html"><span> Shell</span></a></li><li><a class="site-page" href="/categories/iptables/"><span> Iptables</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> Kubernetes</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/categories/rke/"><span> rke</span></a></li><li><a class="site-page" href="/kubernetes/index.html"><span> kubernetes</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 监控</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/prometheus/index.html"><span> Prometheus</span></a></li><li><a class="site-page" href="/categories/grafana/"><span> Grafana</span></a></li><li><a class="site-page" href="/categories/alertmanager/"><span> AlertMnager</span></a></li><li><a class="site-page" href="/categories/zabbix/"><span> Zabbix</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 开发</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/golang/index.html"><span> Golang</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">ceph-theory-PG</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2020-12-17T07:34:35.000Z" title="Created 2020-12-17 15:34:35">2020-12-17</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2020-12-17T09:20:47.867Z" title="Updated 2020-12-17 17:20:47">2020-12-17</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/ceph/">ceph</a></span></div><div class="meta-secondline"> <span class="post-meta-separator">|</span><span class="post-meta-pv-cv"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>​    PG全名placement group。当向ceph cluster中存放数据时，objects会映射到一个个的PG中，每个PG又会映射到一个个的OSD。我们把objects映射到PG中，这样就大大减少我们需要跟踪的每个object元数据和需要运行的进程的数量。增加PG的数量可以减少OSD的负载，可以减少计算的成本。但是每个PG在存储它的osd上需要更多的CPU和内存，因为每个PG本身也需要使用系统资源CPU和内存。如果没有PG，那么在上百个osd上管理上百上千万个objects和他们的副本的难度可想而知。</p>
+<h2 id="PGs是怎么用的？"><a href="#PGs是怎么用的？" class="headerlink" title="PGs是怎么用的？"></a>PGs是怎么用的？</h2><p><img src="https://5017-1304333899.cos.ap-beijing.myqcloud.com/ceph-theory-PG/image-20201216174054275.png" alt="image-20201216174054275"></p>
+<p>通过上图可以看到，多个objects映射到不同的PG中，多个PG组成一个pool。PG中的objects的实际数据是存储在OSD中的，OSD是数据实际存储位置。如果设置了replicated=2，那么每个PG会将映射到他们的objects存储到两个OSD中，如下图：</p>
+<p><img src="https://5017-1304333899.cos.ap-beijing.myqcloud.com/ceph-theory-PG/image-20201216174330299.png" alt="image-20201216174330299"></p>
+<p>​    当OSD#2出现故障无法使用时，为了满足了replicated=2的要求，首先ceph会将PG#1映射到一个新的OSD,比如OSD#X;然后将OSD#1中的所有属于PG#1的objects的数据拷贝一份到OSD#X上。</p>
+<p>​    当pool size由2变为3时，一个新的OSD将会被分配给PG，然后会将PG中的所有objects都拷贝一份到新的OSD上。</p>
+<p>​    我们要知道，OSD不是某个PG所独占的，而是会和同一个pool或者其他pool中的PG共同拥有的。也就是说一个OSD上会有多个pool的数据。</p>
+<p>​    当PG数量增加后：</p>
+<pre><code>    1. 新的PG将被分配OSD
+    2. 根据crush算法，会将一写PG上的objects复制到新的PG上，然后将老的PG上的objects删除</code></pre>
+<h2 id="数据持久性问题"><a href="#数据持久性问题" class="headerlink" title="数据持久性问题"></a>数据持久性问题</h2><p>如下图：这里假设发生故障的为OSD C，PG对应的replicas为OSD A,OSD B,OSD C</p>
+<ol>
+<li><p>OSD C发生故障，导致这个OSD C上的所有objects都丢失了。对于PG来说，意味着replica从3降为了2。</p>
+</li>
+<li><p>如果ceph集群上有多于3个OSD，这时ceph会选择一个其他的OSD，比如选择了OSD X，然后将故障OSD C上丢失objects，从另外两个replica中选择一个replica，假如选择了OSD A，然后会将OSD A上对应的PG的所有objects都拷贝到OSD X上。但是记住，这里一定要注意，在将objects拷贝到OSD X的过程中，OSD A也就是复制源，是fails的(做restore的PG是fail的而不是整个OSD)，这时一些objects只有一份copies是可提供服务的，也就是此时只有OSD B可以提供服务。直到所有OSD C上丢失的object被从A全完拷贝到了OSD X上，才全部可用。这里还要注意，不是整个OSD不可用，而是对应的PG不可用，因为正在恢复这个PG的过程中。</p>
+<p>并且在恢复的过程中，OSD X上对应的PG的objects也是不可用的，直到完全恢复完才恢复可用。</p>
+<p>如果OSD C上只有唯一的一份PG的副本，那么这个PG的数据就永远丢失了。</p>
+</li>
+</ol>
+<p>   上面我们说要多于3个OSD，因为如果你只有3个OSD，现在损坏了一个，是无法将replicas恢复到3的，因为另外两个OSD上目前是有PG的数据的，不可能说将PG的数据在一个OSD上存两份</p>
+<p><img src="https://5017-1304333899.cos.ap-beijing.myqcloud.com/ceph-theory-PG/image-20201217103224415.png" alt="image-20201217103224415"></p>
+<h3 id="举例-10-OSD-cluster"><a href="#举例-10-OSD-cluster" class="headerlink" title="举例 10 OSD cluster"></a>举例 10 OSD cluster</h3><p><img src="https://5017-1304333899.cos.ap-beijing.myqcloud.com/ceph-theory-PG/image-20201217112030274.png" alt="image-20201217112030274"></p>
+<p>ceph cluster有10个OSD,512个PG,replicas为3。</p>
+<ul>
+<li>CRUSH将会给每个PG分配3个OSD</li>
+<li>最后，每个OSD将会管理(512*3)/10 =~ 150PGS</li>
+</ul>
+<p>如果现在有一个OSD fail了，那么会有以下动作：</p>
+<ul>
+<li>当第一个OSD故障后，上面我们计算的是每个OSD管理150 PG，这个故障的OSD对应的150个PG将在同一时间进行recovery操作。</li>
+<li>进行recovery的这150个PG可能均匀的分布在剩余的9个OSD上</li>
+</ul>
+<h3 id="举例20-OSD-cluster"><a href="#举例20-OSD-cluster" class="headerlink" title="举例20 OSD cluster"></a>举例20 OSD cluster</h3><p><img src="https://5017-1304333899.cos.ap-beijing.myqcloud.com/ceph-theory-PG/image-20201217112441851.png" alt="image-20201217112441851"></p>
+<p>ceph cluster有（10–&gt;20）个OSD,512个PG,replicas为3，每个OSD为1TB</p>
+<ul>
+<li>crush将会给每个PG分配3个OSD</li>
+<li>最后，每个OSD将会管理(512*3)/20=~（150–&gt;75）；从10个OSD增加到20个OSD,每个OSD管理的PG减少了一半</li>
+</ul>
+<p>我们知道，当一个OSD故障后，需要将这个OSD上的PG管理的object从其他可用的OSD上拷贝到新的OSD上，下面从copy数据角度来看一下10OSD  VS  20OSD：</p>
+<ul>
+<li>20OSD,当1个OSD故障后，其余19个OSD需要做backfill operation操作，因为我们假设osd大小为1TB,所以19个OSD需要将1TB的数据拷贝到新的OSD上，所以每个OSD需要copy的数据大概为1TB/19=~50G。</li>
+<li>10OSD,当1个OSD故障后，其余9个OSD需要做backfill operation操作，因为我们假设osd大小为1TB,所以9个OSD需要将1TB的数据拷贝到新的OSD上，所以每个OSD需要copy的数据大概为1TB/9=~100GB。</li>
+</ul>
+<p>所以说，当OSD数量增大的时候，如果发生OSD故障，那么恢复速度会更快。</p>
+<h3 id="举例-40-OSD-cluster"><a href="#举例-40-OSD-cluster" class="headerlink" title="举例 40 OSD cluster"></a>举例 40 OSD cluster</h3><p><img src="https://5017-1304333899.cos.ap-beijing.myqcloud.com/ceph-theory-PG/image-20201217113206046.png" alt="image-20201217113206046"></p>
+<p>同理，如果OSD增加到40个，那么当有一个OSD故障后，其他osd仅需要copy 25GB的数据。</p>
+<h3 id="举例-200-OSD-cluster"><a href="#举例-200-OSD-cluster" class="headerlink" title="举例 200 OSD cluster"></a>举例 200 OSD cluster</h3><p><img src="https://5017-1304333899.cos.ap-beijing.myqcloud.com/ceph-theory-PG/image-20201217113335477.png" alt="image-20201217113335477"></p>
+<p>这里我们看到，当OSD数量增加到200时，每个OSD存储7个PG的数据，当有一个OSD发生故障后，也就是丢失了7个PG的数据，这时需要7*3=21OSD去做backfill operation（pg乘以replica)。</p>
+<p>当10个OSD的时候，如果有一个OSD故障，那么其他OSD需要copy大概100G数据；</p>
+<p>当40个OSD的时候，如果有一个OSD故障，那么其他OSD需要copy大概25G数据；</p>
+<p>当有200个OSD的时候，如果有一个OSD故障，那么其他OSD需要coyp大概47GB数据；</p>
+<p>也就是说不是OSD越多，故障后恢复时间越短，通过上面可以看到，当有40个OSD的时候，copy的数据量最小，当OSD达到200后，copy的数据量反而增加了。</p>
+<h3 id="疑问：为什么200个OSD的时候，一个OSD故障后，backfill的osd为21个？"><a href="#疑问：为什么200个OSD的时候，一个OSD故障后，backfill的osd为21个？" class="headerlink" title="疑问：为什么200个OSD的时候，一个OSD故障后，backfill的osd为21个？"></a>疑问：为什么200个OSD的时候，一个OSD故障后，backfill的osd为21个？</h3><p>我们看到，当osd为10，20，40的时候，如果一个osd发生故障，那么剩余的所有OSD都将进行backfill,当osd为200的时候，如果1个osd发生故障，那么仅有21个osd做backfill。</p>
+<p>解释：当有10个OSD时，512个PG，每个PG有3个replicas,那么总共应该有512*3=1536个PG，所以每个OSD大概承载150个PG。</p>
+<p>当有一个OSD故障后，也就是说有150个PG的数据丢失了，这150个PG肯定是不同的PG，因为一个OSD上不可能有两份一样的PG数据。那么这150个PG的数据应该会均匀的分布在其他9个OSD上。</p>
+<p>​    当有20个，40个OSD的时候同理。</p>
+<p>​    但是当有200个OSD的时候，我们看到，512个PG，replica=3，那么1536个PG要分布到200个OSD上，那么平均每个OSD大概承载7个PG，那么当一个OSD故障后，仅有7个PG数据丢失，所以仅需要恢复7个PG即可，那么7个PG肯定是不可能分布到199个OSD上了，所以这里是7*3=21个OSD需要做backfill</p>
+<p>总结一下：OSD数量应该根据实际需求来，不能太多也不能太少，太少了数据安全和故障恢复速度都有影响。</p>
+<h2 id="Objects分配问题"><a href="#Objects分配问题" class="headerlink" title="Objects分配问题"></a>Objects分配问题</h2><p>如果只有一个PG，有10个OSD，replica=3,那么仅有3个OSD会被使用，剩余的7个OSD是使用不到的。只有PG增多的情况下，object才能更均匀的分布到其他所有OSD上。</p>
+<p><img src="https://5017-1304333899.cos.ap-beijing.myqcloud.com/ceph-theory-PG/image-20201217150559336.png" alt="image-20201217150559336"></p>
+<p><img src="https://5017-1304333899.cos.ap-beijing.myqcloud.com/ceph-theory-PG/image-20201217151119632.png" alt="image-20201217151119632"></p>
+<h3 id="设置多少PG合适呢？"><a href="#设置多少PG合适呢？" class="headerlink" title="设置多少PG合适呢？"></a>设置多少PG合适呢？</h3><p><img src="https://5017-1304333899.cos.ap-beijing.myqcloud.com/ceph-theory-PG/image-20201217151123326.png" alt="image-20201217151123326"></p>
+<p>如果OSD的数量比较少，建议使用下面建议的PG数量</p>
+<p><img src="https://5017-1304333899.cos.ap-beijing.myqcloud.com/ceph-theory-PG/image-20201217151209453.png" alt="image-20201217151209453"></p>
+<p>举例：</p>
+<p><img src="https://5017-1304333899.cos.ap-beijing.myqcloud.com/ceph-theory-PG/image-20201217151412833.png" alt="image-20201217151412833"></p>
+<h2 id="如何根据实际情况调整PG和PGP"><a href="#如何根据实际情况调整PG和PGP" class="headerlink" title="如何根据实际情况调整PG和PGP"></a>如何根据实际情况调整PG和PGP</h2><p>ceph cluster经过长期的使用，可能出现下面这些情况：</p>
+<ol>
+<li>OSD可能增加或者减少</li>
+<li>pool数量可能增加或者减少</li>
+</ol>
+<p>那么如果根据cluster的现状来调整PG和PGP的数量？</p>
+<p>调整PG和PGP首先要知道PGP的作用，那什么是PGP呢？</p>
+<p>PGP is the PG for Placement purpose, which should be kept equal to the total number of PGs。</p>
+<p>调整PG和PGP的步骤：</p>
+<h3 id="先查看当前集群中PG-PGP的值："><a href="#先查看当前集群中PG-PGP的值：" class="headerlink" title="先查看当前集群中PG,PGP的值："></a>先查看当前集群中PG,PGP的值：</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">[root@ceph1]#</span><span class="bash"> ceph osd pool get fs_data pg_num   //fs_data是你自己定的pool名称</span></span><br><span class="line">pg_num: 128</span><br><span class="line"><span class="meta">[root@ceph1]#</span><span class="bash"> ceph osd pool get fs_data pgp_num</span></span><br><span class="line">pgp_num: 128</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="查看目前cluster各项重要参数"><a href="#查看目前cluster各项重要参数" class="headerlink" title="查看目前cluster各项重要参数"></a>查看目前cluster各项重要参数</h3><p>{osd number,replication pool size,pool count}</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@ceph1 mysql]# ceph osd dump|grep size</span><br><span class="line">pool 0 &#x27;rbd&#x27; replicated size 3 min_size 2 crush_ruleset 0 object_hash rjenkins pg_num 64 pgp_num 64 </span><br><span class="line">pool 1 &#x27;fs_data&#x27; replicated size 3 min_size 2 crush_ruleset 0 object_hash rjenkins pg_num 128 pgp_num 128 </span><br><span class="line">pool 2 &#x27;fs_metadata&#x27; replicated size 3 min_size 2 crush_ruleset 0 object_hash rjenkins pg_num 128 pgp_num 128 last_change 423 flags hashpspool stripe_width 0</span><br></pre></td></tr></table></figure>
+
+<p>osd number=3,replication pool size=3,pool count=3</p>
+<p>所以根据公式<img src="https://5017-1304333899.cos.ap-beijing.myqcloud.com/ceph-theory-PG/image-20201217152651384.png" alt="image-20201217152651384">来计算PG数量，我这里因为OSD只有三个，所以使用的是建议值128，如果osd比较多，还是按照公式来计算。</p>
+<h3 id="设置PG和PGP的值"><a href="#设置PG和PGP的值" class="headerlink" title="设置PG和PGP的值"></a>设置PG和PGP的值</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ceph osd pool set pool-name  pg_num  256</span><br><span class="line">ceph osd pool set pool-name  pgp_num  256</span><br></pre></td></tr></table></figure>
+
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="mailto:undefined">豪仔的老爹</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="https://www.for-dba.com/ceph-theory-PG.html">https://www.for-dba.com/ceph-theory-PG.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/ceph-pg/">ceph pg</a></div><div class="post_share"><div class="social-share" data-image="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/ceph-theory-OsdAndPg.html"><img class="prev-cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">Previous Post</div><div class="prev_info">ceph-theory-OsdAndPg</div></div></a></div><div class="next-post pull-right"><a href="/mysql-theory-replicate-event-pg.html"><img class="next-cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">mysql-theory-replicate-event-pg</div></div></a></div></nav><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> Comment</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside_content" id="aside_content"><div class="card-widget card-info"><div class="card-content"><div class="card-info-avatar is-center"><img class="avatar-img" src="https://5017-1304333899.cos.ap-beijing.myqcloud.com/webwxgetmsgimg.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/><div class="author-info__name">豪仔的老爹</div><div class="author-info__description"></div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">28</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">15</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">7</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div></div><div class="card-widget card-announcement"><div class="card-content"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>Announcement</span></div><div class="announcement_content">邮件交流：365084797@qq.com</div></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="card-content"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#PGs%E6%98%AF%E6%80%8E%E4%B9%88%E7%94%A8%E7%9A%84%EF%BC%9F"><span class="toc-number">1.</span> <span class="toc-text">PGs是怎么用的？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E6%8C%81%E4%B9%85%E6%80%A7%E9%97%AE%E9%A2%98"><span class="toc-number">2.</span> <span class="toc-text">数据持久性问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BE%E4%BE%8B-10-OSD-cluster"><span class="toc-number">2.1.</span> <span class="toc-text">举例 10 OSD cluster</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BE%E4%BE%8B20-OSD-cluster"><span class="toc-number">2.2.</span> <span class="toc-text">举例20 OSD cluster</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BE%E4%BE%8B-40-OSD-cluster"><span class="toc-number">2.3.</span> <span class="toc-text">举例 40 OSD cluster</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BE%E4%BE%8B-200-OSD-cluster"><span class="toc-number">2.4.</span> <span class="toc-text">举例 200 OSD cluster</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%96%91%E9%97%AE%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88200%E4%B8%AAOSD%E7%9A%84%E6%97%B6%E5%80%99%EF%BC%8C%E4%B8%80%E4%B8%AAOSD%E6%95%85%E9%9A%9C%E5%90%8E%EF%BC%8Cbackfill%E7%9A%84osd%E4%B8%BA21%E4%B8%AA%EF%BC%9F"><span class="toc-number">2.5.</span> <span class="toc-text">疑问：为什么200个OSD的时候，一个OSD故障后，backfill的osd为21个？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Objects%E5%88%86%E9%85%8D%E9%97%AE%E9%A2%98"><span class="toc-number">3.</span> <span class="toc-text">Objects分配问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%BE%E7%BD%AE%E5%A4%9A%E5%B0%91PG%E5%90%88%E9%80%82%E5%91%A2%EF%BC%9F"><span class="toc-number">3.1.</span> <span class="toc-text">设置多少PG合适呢？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E6%A0%B9%E6%8D%AE%E5%AE%9E%E9%99%85%E6%83%85%E5%86%B5%E8%B0%83%E6%95%B4PG%E5%92%8CPGP"><span class="toc-number">4.</span> <span class="toc-text">如何根据实际情况调整PG和PGP</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%88%E6%9F%A5%E7%9C%8B%E5%BD%93%E5%89%8D%E9%9B%86%E7%BE%A4%E4%B8%ADPG-PGP%E7%9A%84%E5%80%BC%EF%BC%9A"><span class="toc-number">4.1.</span> <span class="toc-text">先查看当前集群中PG,PGP的值：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8B%E7%9B%AE%E5%89%8Dcluster%E5%90%84%E9%A1%B9%E9%87%8D%E8%A6%81%E5%8F%82%E6%95%B0"><span class="toc-number">4.2.</span> <span class="toc-text">查看目前cluster各项重要参数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%BE%E7%BD%AEPG%E5%92%8CPGP%E7%9A%84%E5%80%BC"><span class="toc-number">4.3.</span> <span class="toc-text">设置PG和PGP的值</span></a></li></ol></li></ol></div></div></div><div class="card-widget card-recent-post"><div class="card-content"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/ceph-theory-OsdAndPg.html" title="ceph-theory-OsdAndPg">ceph-theory-OsdAndPg</a><time datetime="2020-12-17T09:19:18.000Z" title="Created 2020-12-17 17:19:18">2020-12-17</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/ceph-theory-PG.html" title="ceph-theory-PG">ceph-theory-PG</a><time datetime="2020-12-17T07:34:35.000Z" title="Created 2020-12-17 15:34:35">2020-12-17</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/mysql-theory-replicate-event-pg.html" title="mysql-theory-replicate-event-pg">mysql-theory-replicate-event-pg</a><time datetime="2020-12-16T09:16:37.000Z" title="Created 2020-12-16 17:16:37">2020-12-16</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/mysql-theory-replicate-event-fd.html" title="mysql-theory-replicate-event-fd">mysql-theory-replicate-event-fd</a><time datetime="2020-12-16T07:26:07.000Z" title="Created 2020-12-16 15:26:07">2020-12-16</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/mysql-theory-replicate-event.html" title="mysql主从复制-event格式">mysql主从复制-event格式</a><time datetime="2020-12-16T07:03:24.000Z" title="Created 2020-12-16 15:03:24">2020-12-16</time></div></div></div></div></div></div></div></main><footer id="footer" style="background-image: url(https://5017-1304333899.cos.ap-beijing.myqcloud.com/picture/6.jpg)"><div id="footer-wrap"><div class="copyright">&copy;2020 By 豪仔的老爹</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="Scroll To Comments"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="Back To Top"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    let initData = {
+      el: '#vcomment',
+      appId: '8pmThnDCYUdGoOgLWsVPzKOI-gzGzoHsz',
+      appKey: 'nt3vchWbGYf7q7Txb7PjAu1B',
+      placeholder: 'Please leave your footprints',
+      avatar: 'monsterid',
+      meta: 'nick,mail,link'.split(','),
+      pageSize: '10',
+      lang: 'en',
+      recordIP: false,
+      serverURLs: '',
+      emojiCDN: '',
+      emojiMaps: "",
+      enableQQ: false,
+      path: window.location.pathname,
+    }
+
+    if (true) { 
+      initData.requiredFields= ('nick,mail'.split(','))
+    }
+    
+    if (false) {
+      const otherData = false
+      initData = Object.assign({}, initData, otherData)
+    }
+    
+    const valine = new Valine(initData)
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
+
+if ('Valine' === 'Valine' || !false) {
+  if (false) btf.loadComment(document.querySelector('#vcomment'),loadValine)
+  else setTimeout(() => loadValine(), 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="99" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/canvas-nest.min.js"></script><script id="click-heart" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/click-heart.min.js" async="async" mobile="false"></script></div></body></html>
