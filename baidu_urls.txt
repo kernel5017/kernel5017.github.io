@@ -1,3 +1,5 @@
+https://www.for-dba.com/ceph-theory-OsdAndPg.html
+https://www.for-dba.com/ceph-theory-PG.html
 https://www.for-dba.com/mysql-theory-replicate-event-pg.html
 https://www.for-dba.com/mysql-theory-replicate-event-fd.html
 https://www.for-dba.com/mysql-theory-replicate-event.html
