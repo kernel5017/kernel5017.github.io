@@ -1,3 +1,4 @@
+https://www.for-dba.com/mysql-theory-gtid-log-event.html
 https://www.for-dba.com/ceph-theory-pgnumVSpgpnum.html
 https://www.for-dba.com/ceph-theory-OsdAndPg.html
 https://www.for-dba.com/ceph-theory-PG.html
