@@ -1,0 +1,571 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ceph-problem-cannot_mount_cephfs | 豪仔的老爹</title><meta name="author" content="豪仔的老爹"><meta name="copyright" content="豪仔的老爹"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><meta name="description" content="无法mount cephfs情况描述​    测试环境有4个ceph节点、5个osd，数据写入大概13G左右，集群整体还有5个多G可用空间。由于测试其他问题，需要删除一个ceph node节点，恢复为3个osd。于是将挂载目录中的数据全部删除，接着停止osd，剔除osd。 ​    恢复到3个节点，3个osd后，集群健康状态为OK。但是写入数据出现问题，刚开始使用dd命令创建一个1G的文件，生成到">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ceph-problem-cannot_mount_cephfs">
+<meta property="og:url" content="https://www.for-dba.com/ceph-problem-cannot-mount-cephfs.html">
+<meta property="og:site_name" content="豪仔的老爹">
+<meta property="og:description" content="无法mount cephfs情况描述​    测试环境有4个ceph节点、5个osd，数据写入大概13G左右，集群整体还有5个多G可用空间。由于测试其他问题，需要删除一个ceph node节点，恢复为3个osd。于是将挂载目录中的数据全部删除，接着停止osd，剔除osd。 ​    恢复到3个节点，3个osd后，集群健康状态为OK。但是写入数据出现问题，刚开始使用dd命令创建一个1G的文件，生成到">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg">
+<meta property="article:published_time" content="2020-12-15T08:26:56.000Z">
+<meta property="article:modified_time" content="2020-12-21T07:55:58.997Z">
+<meta property="article:author" content="豪仔的老爹">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://www.for-dba.com/ceph-problem-cannot-mount-cephfs"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  ClickShowText: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+};
+
+var saveToLocal = {
+  set: function setWithExpiry(key, value, ttl) {
+    const now = new Date()
+    const expiryDay = ttl * 86400000
+    const item = {
+      value: value,
+      expiry: now.getTime() + expiryDay,
+    }
+    localStorage.setItem(key, JSON.stringify(item))
+  },
+
+  get: function getWithExpiry(key) {
+    const itemStr = localStorage.getItem(key)
+
+    if (!itemStr) {
+      return undefined
+    }
+    const item = JSON.parse(itemStr)
+    const now = new Date()
+
+    if (now.getTime() > item.expiry) {
+      localStorage.removeItem(key)
+      return undefined
+    }
+    return item.value
+  }
+}
+
+// https://stackoverflow.com/questions/16839698/jquery-getscript-alternative-in-native-javascript
+const getScript = url => new Promise((resolve, reject) => {
+  const script = document.createElement('script')
+  script.src = url
+  script.async = true
+  script.onerror = reject
+  script.onload = script.onreadystatechange = function() {
+    const loadState = this.readyState
+    if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+    script.onload = script.onreadystatechange = null
+    resolve()
+  }
+  document.head.appendChild(script)
+})</script><script id="config_change">var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2020-12-21 15:55:58'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(function () {  window.activateDarkMode = function () {
+    document.documentElement.setAttribute('data-theme', 'dark')
+    if (document.querySelector('meta[name="theme-color"]') !== null) {
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+    }
+  }
+  window.activateLightMode = function () {
+    document.documentElement.setAttribute('data-theme', 'light')
+   if (document.querySelector('meta[name="theme-color"]') !== null) {
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+    }
+  }
+  const autoChangeMode = 'false'
+  const t = saveToLocal.get('theme')
+  if (autoChangeMode === '1') {
+    const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+    const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+    const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+    if (t === undefined) {
+      if (isLightMode) activateLightMode()
+      else if (isDarkMode) activateDarkMode()
+      else if (isNotSpecified || hasNoSupport) {
+        const now = new Date()
+        const hour = now.getHours()
+        const isNight = hour <= 6 || hour >= 18
+        isNight ? activateDarkMode() : activateLightMode()
+      }
+      window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+        if (saveToLocal.get('theme') === undefined) {
+          e.matches ? activateDarkMode() : activateLightMode()
+        }
+      })
+    } else if (t === 'light') activateLightMode()
+    else activateDarkMode()
+  } else if (autoChangeMode === '2') {
+    const now = new Date()
+    const hour = now.getHours()
+    const isNight = hour <= 6 || hour >= 18
+    if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+    else if (t === 'light') activateLightMode()
+    else activateDarkMode()
+  } else {
+    if (t === 'dark') activateDarkMode()
+    else if (t === 'light') activateLightMode()
+  }const asideStatus = saveToLocal.get('aside-status')
+if (asideStatus !== undefined) {
+   if (asideStatus === 'hide') {
+     document.documentElement.classList.add('hide-aside')
+   } else {
+     document.documentElement.classList.remove('hide-aside')
+   }
+}})()</script><meta name="generator" content="Hexo 5.2.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" src="https://5017-1304333899.cos.ap-beijing.myqcloud.com/webwxgetmsgimg.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">37</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">15</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">8</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 数据库&amp;存储</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/mysql/index.html"><span> MySQL</span></a></li><li><a class="site-page" href="/categories/etcd/"><span> ETCD</span></a></li><li><a class="site-page" href="/categories/redis/"><span> Redis</span></a></li><li><a class="site-page" href="/ceph/index.html"><span> Ceph</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> Linux</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/linux/index.html"><span> Linux</span></a></li><li><a class="site-page" href="/shell/index.html"><span> Shell</span></a></li><li><a class="site-page" href="/categories/iptables/"><span> Iptables</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> Kubernetes</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/categories/rke/"><span> rke</span></a></li><li><a class="site-page" href="/kubernetes/index.html"><span> kubernetes</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 监控</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/prometheus/index.html"><span> Prometheus</span></a></li><li><a class="site-page" href="/categories/grafana/"><span> Grafana</span></a></li><li><a class="site-page" href="/categories/alertmanager/"><span> AlertMnager</span></a></li><li><a class="site-page" href="/categories/zabbix/"><span> Zabbix</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> Hadoop</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/cloudera/index.html"><span> cloudera</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 开发</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/golang/index.html"><span> Golang</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(https://5017-1304333899.cos.ap-beijing.myqcloud.com/picture/19.jpg)"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">豪仔的老爹</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 数据库&amp;存储</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/mysql/index.html"><span> MySQL</span></a></li><li><a class="site-page" href="/categories/etcd/"><span> ETCD</span></a></li><li><a class="site-page" href="/categories/redis/"><span> Redis</span></a></li><li><a class="site-page" href="/ceph/index.html"><span> Ceph</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> Linux</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/linux/index.html"><span> Linux</span></a></li><li><a class="site-page" href="/shell/index.html"><span> Shell</span></a></li><li><a class="site-page" href="/categories/iptables/"><span> Iptables</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> Kubernetes</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/categories/rke/"><span> rke</span></a></li><li><a class="site-page" href="/kubernetes/index.html"><span> kubernetes</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 监控</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/prometheus/index.html"><span> Prometheus</span></a></li><li><a class="site-page" href="/categories/grafana/"><span> Grafana</span></a></li><li><a class="site-page" href="/categories/alertmanager/"><span> AlertMnager</span></a></li><li><a class="site-page" href="/categories/zabbix/"><span> Zabbix</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> Hadoop</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/cloudera/index.html"><span> cloudera</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 开发</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/golang/index.html"><span> Golang</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">ceph-problem-cannot_mount_cephfs</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2020-12-15T08:26:56.000Z" title="Created 2020-12-15 16:26:56">2020-12-15</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2020-12-21T07:55:58.997Z" title="Updated 2020-12-21 15:55:58">2020-12-21</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/ceph/">ceph</a></span></div><div class="meta-secondline"> <span class="post-meta-separator">|</span><span class="post-meta-pv-cv"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="无法mount-cephfs"><a href="#无法mount-cephfs" class="headerlink" title="无法mount cephfs"></a>无法mount cephfs</h1><h2 id="情况描述"><a href="#情况描述" class="headerlink" title="情况描述"></a>情况描述</h2><p>​    测试环境有4个ceph节点、5个osd，数据写入大概13G左右，集群整体还有5个多G可用空间。由于测试其他问题，需要删除一个ceph node节点，恢复为3个osd。于是将挂载目录中的数据全部删除，接着停止osd，剔除osd。</p>
+<p>​    恢复到3个节点，3个osd后，集群健康状态为OK。但是写入数据出现问题，刚开始使用dd命令创建一个1G的文件，生成到大概300M左右，就卡住不动了。然后创建了几个小文件，写入到十几K的时候也不动了。于是umount这个目录，发现无法卸载，最后重启后重新挂载，发现无法挂载了，报错是<strong>connection time out</strong>。</p>
+<p>​    查看ceph日志，没有什么特别的异常。于是查看client机器的日志，发现报错：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Dec 15 16:19:49 hxzh-129 kernel: libceph: mon0 10.3.139.101:6789 missing required protocol features</span><br><span class="line">Dec 15 16:19:59 hxzh-129 kernel: libceph: mon0 10.3.139.101:6789 feature set mismatch, my 107b84a842aca &lt; server&#x27;s 40107b84a842aca, missing 400000000000000</span><br><span class="line">Dec 15 16:19:59 hxzh-129 kernel: libceph: mon0 10.3.139.101:6789 missing required protocol features</span><br><span class="line">Dec 15 16:20:01 hxzh-129 systemd: Started Session 6 of user root.</span><br><span class="line">Dec 15 16:20:09 hxzh-129 kernel: libceph: mon0 10.3.139.101:6789 feature set mismatch, my 107b84a842aca &lt; server&#x27;s 40107b84a842aca, missing 400000000000000</span><br><span class="line">Dec 15 16:20:09 hxzh-129 kernel: libceph: mon0 10.3.139.101:6789 missing required protocol features</span><br><span class="line">Dec 15 16:20:19 hxzh-129 kernel: libceph: mon0 10.3.139.101:6789 feature set mismatch, my 107b84a842aca &lt; server&#x27;s 40107b84a842aca, missing 400000000000000</span><br></pre></td></tr></table></figure>
+
+<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>这个报错是因为挂载cephfs的客户端缺少对flag 400000000000000的支持。</p>
+<p>如果要支持这个特性，需要满足以下条件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">v10.0.2 (jewel) or later</span><br><span class="line">Linux kernel version v4.5 or later (for the file system and RBD kernel clients)</span><br></pre></td></tr></table></figure>
+
+<p>我的版本为：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">4.4.240-1.el7.elrepo.x86_64</span><br></pre></td></tr></table></figure>
+
+
+
+<p>ceph tunables</p>
+<p>​    我们知道ceph client通过crush算法来寻找自己需要的数据存储在哪个osd上。随着时间的推移，ceph crush算法有很多改进，每个ceph版本都有相应的crush算法。为了能够让的不同版本支持不同的crush算法，ceph引入了tunable options,这些选项控制着使用哪个版本的crush算法。</p>
+<p>​    为了使用更新版本的tunables,clients和servers都必须支持新版的CRUSH。基于这个原因，引入了以ceph版本命名的profiles文件。比如firefly tunables是Firefly版本支持的，它不能在老版本上工作，比如Dumpling（比Firefly早）。</p>
+<p>​    一旦给定的可调参数集改变了默认的legacy，那么ceph-mon和ceph-osd将阻止不支持新的CRUSH特性的老客户端连接到集群。</p>
+<p>具体看文档<a target="_blank" rel="noopener" href="https://docs.ceph.com/en/latest/rados/operations/crush-map/">https://docs.ceph.com/en/latest/rados/operations/crush-map/</a></p>
+<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><p>设置feature flags不需要flag <code>400000000000000</code>的支持</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph osd crush tunables hammer</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h1 id="关于Feature-Set-Mismatch-Error-on-Ceph-Kernel-Client问题总结"><a href="#关于Feature-Set-Mismatch-Error-on-Ceph-Kernel-Client问题总结" class="headerlink" title="关于Feature Set Mismatch Error on Ceph Kernel Client问题总结"></a>关于Feature Set Mismatch Error on Ceph Kernel Client问题总结</h1><p>根据你的kernel版本不同，可能会出现你的kernel无法提供ceph集群需要的一些特性。或者或者你的ceph client需要的一些特性，但是ceph cluster无法满足，所以会出现”feature set mismatch”这个报错。</p>
+<p>比如以下报错：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mon0 192.168.0.1:6789 feature set mismatch, my XXXXXX &lt; server&#x27;s XXXXXX, missing 2040000</span><br></pre></td></tr></table></figure>
+
+<p>解决：Upgrade kernel client up to 3.9 or set tunables to legacy : <code>ceph osd crush tunables legacy</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mon0 192.168.0.1:6789 feature set mismatch, my XXXXXX &lt; server&#x27;s XXXXXX, missing 40000000</span><br></pre></td></tr></table></figure>
+
+<p>解决：Upgrade kernel client up to 3.9 or unset hashpspool : <code>ceph osd pool set rbd hashpspool false</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mon0 192.168.0.1:6789 feature set mismatch, my XXXXXX &lt; server&#x27;s XXXXXX, missing 800000000</span><br></pre></td></tr></table></figure>
+
+<p>解决： Remove cache pool and reload monitors or upgrade kernel client up to 3.14</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mon0 192.168.0.1:6789 feature set mismatch, my XXXXXX &lt; server&#x27;s XXXXXX, missing 1000000000</span><br></pre></td></tr></table></figure>
+
+<p>解决： Upgrade kernel client up to 3.14</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mon0 192.168.0.1:6789 feature set mismatch, my 4a042a42 &lt; server&#x27;s 2004a042a42, missing 20000000000</span><br></pre></td></tr></table></figure>
+
+<p>解决：Upgrade kernel client up to 3.15 or disable tunable 3 features</p>
+<h2 id="ceph-feature-table-和kernel-version"><a href="#ceph-feature-table-和kernel-version" class="headerlink" title="ceph_feature table 和kernel version"></a>ceph_feature table 和kernel version</h2><p>怎么看这个表，下面举例：</p>
+<p>比如报错missing 2040000 表示ceph_feature_crush_tunables(40000)和ceph_feature_crush_runables2(2000000)在client kernel端缺失了。</p>
+<p>R:requires   S: support   -X-:feature is new since this verion</p>
+<table>
+<thead>
+<tr>
+<th align="left">Feature</th>
+<th align="center">BIT</th>
+<th align="right">OCT</th>
+<th align="center">3.8</th>
+<th align="center">3.9</th>
+<th align="center">3.10</th>
+<th align="center">3.14</th>
+<th align="center">3.15</th>
+<th align="center">3.18</th>
+<th align="center">4.1</th>
+<th align="center">4.5</th>
+<th align="center">4.6</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">CEPH_FEATURE_NOSRCADDR</td>
+<td align="center">1</td>
+<td align="right">2</td>
+<td align="center">R</td>
+<td align="center">R</td>
+<td align="center">R</td>
+<td align="center">R</td>
+<td align="center">R</td>
+<td align="center">R</td>
+<td align="center">R</td>
+<td align="center">R</td>
+<td align="center">R</td>
+</tr>
+<tr>
+<td align="left">CEPH_FEATURE_SUBSCRIBE2</td>
+<td align="center">4</td>
+<td align="right">10</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">-R-</td>
+</tr>
+<tr>
+<td align="left">CEPH_FEATURE_RECONNECT_SEQ</td>
+<td align="center">6</td>
+<td align="right">40</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">-R-</td>
+<td align="center">R</td>
+<td align="center">R</td>
+<td align="center">R</td>
+<td align="center">R</td>
+<td align="center">R</td>
+<td align="center">R</td>
+</tr>
+<tr>
+<td align="left">CEPH_FEATURE_PGID64</td>
+<td align="center">9</td>
+<td align="right">200</td>
+<td align="center"></td>
+<td align="center">R</td>
+<td align="center">R</td>
+<td align="center">R</td>
+<td align="center">R</td>
+<td align="center">R</td>
+<td align="center">R</td>
+<td align="center">R</td>
+<td align="center">R</td>
+</tr>
+<tr>
+<td align="left">CEPH_FEATURE_PGPOOL3</td>
+<td align="center">11</td>
+<td align="right">800</td>
+<td align="center"></td>
+<td align="center">R</td>
+<td align="center">R</td>
+<td align="center">R</td>
+<td align="center">R</td>
+<td align="center">R</td>
+<td align="center">R</td>
+<td align="center">R</td>
+<td align="center">R</td>
+</tr>
+<tr>
+<td align="left">CEPH_FEATURE_OSDENC</td>
+<td align="center">13</td>
+<td align="right">2000</td>
+<td align="center"></td>
+<td align="center">R</td>
+<td align="center">R</td>
+<td align="center">R</td>
+<td align="center">R</td>
+<td align="center">R</td>
+<td align="center">R</td>
+<td align="center">R</td>
+<td align="center">R</td>
+</tr>
+<tr>
+<td align="left">CEPH_FEATURE_CRUSH_TUNABLES</td>
+<td align="center">18</td>
+<td align="right">40000</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+</tr>
+<tr>
+<td align="left">CEPH_FEATURE_MSG_AUTH</td>
+<td align="center">23</td>
+<td align="right">800000</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">-S-</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+</tr>
+<tr>
+<td align="left">CEPH_FEATURE_CRUSH_TUNABLES2</td>
+<td align="center">25</td>
+<td align="right">2000000</td>
+<td align="center"></td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+</tr>
+<tr>
+<td align="left">CEPH_FEATURE_REPLY_CREATE_INODE</td>
+<td align="center">27</td>
+<td align="right">8000000</td>
+<td align="center"></td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+</tr>
+<tr>
+<td align="left">CEPH_FEATURE_OSDHASHPSPOOL</td>
+<td align="center">30</td>
+<td align="right">40000000</td>
+<td align="center"></td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+</tr>
+<tr>
+<td align="left">CEPH_FEATURE_OSD_CACHEPOOL</td>
+<td align="center">35</td>
+<td align="right">800000000</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">-S-</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+</tr>
+<tr>
+<td align="left">CEPH_FEATURE_CRUSH_V2</td>
+<td align="center">36</td>
+<td align="right">1000000000</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">-S-</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+</tr>
+<tr>
+<td align="left">CEPH_FEATURE_EXPORT_PEER</td>
+<td align="center">37</td>
+<td align="right">2000000000</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">-S-</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+</tr>
+<tr>
+<td align="left">CEPH_FEATURE_OSD_ERASURE_CODES***</td>
+<td align="center">38</td>
+<td align="right">4000000000</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="left">CEPH_FEATURE_OSDMAP_ENC</td>
+<td align="center">39</td>
+<td align="right">8000000000</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">-S-</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+</tr>
+<tr>
+<td align="left">CEPH_FEATURE_CRUSH_TUNABLES3</td>
+<td align="center">41</td>
+<td align="right">20000000000</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">-S-</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+</tr>
+<tr>
+<td align="left">CEPH_FEATURE_OSD_PRIMARY_AFFINITY</td>
+<td align="center">41*</td>
+<td align="right">20000000000</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">-S-</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+<td align="center">S</td>
+</tr>
+<tr>
+<td align="left">CEPH_FEATURE_CRUSH_V4 ****</td>
+<td align="center">48</td>
+<td align="right">1000000000000</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">-S-</td>
+<td align="center">S</td>
+<td align="center">S</td>
+</tr>
+<tr>
+<td align="left">CEPH_FEATURE_CRUSH_TUNABLES5</td>
+<td align="center">58</td>
+<td align="right">200000000000000</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">-S-</td>
+<td align="center">S</td>
+</tr>
+<tr>
+<td align="left">CEPH_FEATURE_NEW_OSDOPREPLY_ENCODING</td>
+<td align="center">58*</td>
+<td align="right">400000000000000</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">-S-</td>
+<td align="center">S</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>(*** Note that CEPH_FEATURE_OSD_ERASURE_CODES is no more required for client since firefly)</p>
+</blockquote>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="mailto:undefined">豪仔的老爹</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="https://www.for-dba.com/ceph-problem-cannot-mount-cephfs.html">https://www.for-dba.com/ceph-problem-cannot-mount-cephfs.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"><div class="social-share" data-image="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/ceph-stuck-active-remapped-1.html"><img class="prev-cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">Previous Post</div><div class="prev_info">ceph-stuck-active+remapped</div></div></a></div><div class="next-post pull-right"><a href="/ceph-theory-add-osd-node.html"><img class="next-cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">ceph-theory-add_osd_node</div></div></a></div></nav><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> Comment</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside_content" id="aside_content"><div class="card-widget card-info"><div class="card-content"><div class="card-info-avatar is-center"><img class="avatar-img" src="https://5017-1304333899.cos.ap-beijing.myqcloud.com/webwxgetmsgimg.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/><div class="author-info__name">豪仔的老爹</div><div class="author-info__description"></div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">37</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">15</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">8</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div></div><div class="card-widget card-announcement"><div class="card-content"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>Announcement</span></div><div class="announcement_content">邮件交流：365084797@qq.com</div></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="card-content"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%97%A0%E6%B3%95mount-cephfs"><span class="toc-number">1.</span> <span class="toc-text">无法mount cephfs</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%83%85%E5%86%B5%E6%8F%8F%E8%BF%B0"><span class="toc-number">1.1.</span> <span class="toc-text">情况描述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0"><span class="toc-number">1.2.</span> <span class="toc-text">原因</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A7%A3%E5%86%B3"><span class="toc-number">1.3.</span> <span class="toc-text">解决</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%85%B3%E4%BA%8EFeature-Set-Mismatch-Error-on-Ceph-Kernel-Client%E9%97%AE%E9%A2%98%E6%80%BB%E7%BB%93"><span class="toc-number">2.</span> <span class="toc-text">关于Feature Set Mismatch Error on Ceph Kernel Client问题总结</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#ceph-feature-table-%E5%92%8Ckernel-version"><span class="toc-number">2.1.</span> <span class="toc-text">ceph_feature table 和kernel version</span></a></li></ol></li></ol></div></div></div><div class="card-widget card-recent-post"><div class="card-content"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/hadoop-install.html" title="hadoop-install">hadoop-install</a><time datetime="2020-12-30T02:46:47.000Z" title="Created 2020-12-30 10:46:47">2020-12-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/mysql-theory-GroupReplication.html" title="mysql-theory-GroupReplication">mysql-theory-GroupReplication</a><time datetime="2020-12-28T06:56:42.000Z" title="Created 2020-12-28 14:56:42">2020-12-28</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/mysql-theory-createTableOutsideDatadir.html" title="mysql-theory-createTableOutsideDatadir">mysql-theory-createTableOutsideDatadir</a><time datetime="2020-12-24T06:52:39.000Z" title="Created 2020-12-24 14:52:39">2020-12-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/mysql-theory-caseSensitivity.html" title="mysql-theory-caseSensitivity">mysql-theory-caseSensitivity</a><time datetime="2020-12-23T10:17:42.000Z" title="Created 2020-12-23 18:17:42">2020-12-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/mysql-theory-sqlMode.html" title="No title">No title</a><time datetime="2020-12-22T09:07:56.873Z" title="Created 2020-12-22 17:07:56">2020-12-22</time></div></div></div></div></div></div></div></main><footer id="footer" style="background-image: url(https://5017-1304333899.cos.ap-beijing.myqcloud.com/picture/19.jpg)"><div id="footer-wrap"><div class="copyright">&copy;2020 By 豪仔的老爹</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="Scroll To Comments"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="Back To Top"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    let initData = {
+      el: '#vcomment',
+      appId: '8pmThnDCYUdGoOgLWsVPzKOI-gzGzoHsz',
+      appKey: 'nt3vchWbGYf7q7Txb7PjAu1B',
+      placeholder: 'Please leave your footprints',
+      avatar: 'monsterid',
+      meta: 'nick,mail,link'.split(','),
+      pageSize: '10',
+      lang: 'en',
+      recordIP: false,
+      serverURLs: '',
+      emojiCDN: '',
+      emojiMaps: "",
+      enableQQ: false,
+      path: window.location.pathname,
+    }
+
+    if (true) { 
+      initData.requiredFields= ('nick,mail'.split(','))
+    }
+    
+    if (false) {
+      const otherData = false
+      initData = Object.assign({}, initData, otherData)
+    }
+    
+    const valine = new Valine(initData)
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
+
+if ('Valine' === 'Valine' || !false) {
+  if (false) btf.loadComment(document.querySelector('#vcomment'),loadValine)
+  else setTimeout(() => loadValine(), 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="99" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/canvas-nest.min.js"></script><script id="click-heart" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/click-heart.min.js" async="async" mobile="false"></script></div></body></html>

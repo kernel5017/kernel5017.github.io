@@ -1,3 +1,10 @@
+https://www.for-dba.com/hadoop-install.html
+https://www.for-dba.com/mysql-theory-GroupReplication.html
+https://www.for-dba.com/mysql-theory-createTableOutsideDatadir.html
+https://www.for-dba.com/mysql-theory-caseSensitivity.html
+https://www.for-dba.com/mysql-theory-sqlMode.html
+https://www.for-dba.com/ceph-theory-removeOsd.html
+https://www.for-dba.com/ceph-theory-pgUpActingSets.html
 https://www.for-dba.com/mysql-theory-gtid-log-event.html
 https://www.for-dba.com/ceph-theory-pgnumVSpgpnum.html
 https://www.for-dba.com/ceph-theory-OsdAndPg.html
