@@ -2,6 +2,20 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://www.for-dba.com/cloudera/index.html</loc>
+    
+    <lastmod>2020-12-30</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.for-dba.com/hadoop/index.html</loc>
+    
+    <lastmod>2020-12-30</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://www.for-dba.com/hadoop-install.html</loc>
     
     <lastmod>2020-12-30</lastmod>
